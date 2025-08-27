@@ -2,10 +2,6 @@
 from Gemeni import GemeniLLMContractInfoExtractor
 from ContractValidator import ContractValidator
 
-
-
-
-
 class InvoiceProcessor:
     """Class to extract invoice information using the Anthropic API."""
     def __init__(self):
