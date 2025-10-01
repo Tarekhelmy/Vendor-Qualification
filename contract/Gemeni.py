@@ -25,7 +25,7 @@ class GemeniLLMContractInfoExtractor:
     def __init__(self):
         # Load environment variables from .env file  
         load_dotenv()
-        api_key = os.getenv("ANTHROPIC_API_KEY")
+        api_key = os.getenv("GEMENI_API_KEY")
         self.gemeni_client = genai.Client(api_key=api_key)
         pass
     def extract_invoice_info_uri(self, file_uri: str) -> ContractData:
@@ -43,7 +43,7 @@ class GemeniLLMContractInfoExtractor:
             doc_data = httpx.get(file_uri).content
             
             response = self.gemeni_client.models.generate_content(
-              model="gemini-2.5-pro",
+              model="gemini-2.5-flash",
               contents=[
                     types.Part.from_bytes(
                     data=doc_data,
@@ -73,11 +73,14 @@ class GemeniLLMContractInfoExtractor:
               f"Extracted Data: {json.dumps(extracted_data)}\n"
               f"Expected Data: {json.dumps(expected_data)}\n"
               f"Check if the parties involved in the contract have a name matching within a reasonable similarity indicating that the same entities are involved.\n"
+              f"Check if the contract date is within a year of the expected date.\n"
+              f"Check if the contract total amount matches the expected amount within a tolerance of 1000 SAR.\n"
+              f"Check if the currency is SAR or USD (if USD, convert to SAR using a rate of 1 USD = 3.75 SAR for comparison).\n"
               f"if there is no match, then return the reason"
           )
           
           response = self.gemeni_client.models.generate_content(
-            model="gemini-2.5-pro",
+            model="gemini-2.5-flash",
             contents=prompt,
             config={
               "response_mime_type": "application/json",
@@ -92,5 +95,5 @@ class GemeniLLMContractInfoExtractor:
             print("Failed to parse response")
             return None
         except Exception as e:
-            print(f"Error extracting invoice info: {str(e)}")
+            print(f"Error Validating Contract: {str(e)}")
             return None

@@ -1,8 +1,8 @@
 
-from Gemeni import GemeniLLMContractInfoExtractor
-from ContractValidator import ContractValidator
+from .Gemeni import GemeniLLMContractInfoExtractor
+from .ContractValidator import ContractValidator
 
-class InvoiceProcessor:
+class ContractProcessor:
     """Class to extract invoice information using the Anthropic API."""
     def __init__(self):
         """Initialize the ImageProcessing class."""
@@ -44,15 +44,15 @@ class InvoiceProcessor:
     
     def process_contract(self, project_data: dict) -> dict:
         """Process contract."""
-        contract_results = self.extract_contract_info_uri(project_data)
+        contract_results = self.extract_contract_info_uri(project_data['file_uri'])
         if not contract_results:
             print("No contract data extracted.")
             return {"is_valid": False, "contract_data": None}
-        
-        expected_amount = project_data.get("contract_value_sar")
-        expected_contracing_company = project_data.get("contracting_company")
-        expected_contracted_company = project_data.get("contracted_company")
-        expected_contract_date = project_data.get("contract_date")
+        print(f"Contract results Extracted")
+        expected_amount = project_data['contract_value_sar']
+        expected_contracing_company = project_data['client_name']
+        expected_contracted_company = 'SHABAKKAT CELLULAR COMPANY'
+        expected_contract_date = project_data['contract_signing_date']
         expected_data = {
             "contracting_company": expected_contracing_company,
             "contracted_company": expected_contracted_company,
@@ -61,8 +61,16 @@ class InvoiceProcessor:
             "currency": "SAR"
         }
         
-        contract_data = contract_results
-        contractValidation = self.compare_contract_info(contract_data, expected_data)
+        contract_data = contract_results[0]
+
+        extracted_data = {
+            "contracting_company": contract_data.contracting_company,
+            "contracted_company": contract_data.contracted_company,
+            "contract_date": contract_data.contract_date,
+            "contract_total_amount": contract_data.contract_total_amount,
+            "currency": contract_data.currency
+        }
+        contractValidation = self.contract_data_extractor.compare_contract_info(extracted_data=extracted_data, expected_data=expected_data)
         return {"is_valid": contractValidation.is_matching, 
                 "reason":contractValidation.reason,  
                 "contract_data": contract_data}

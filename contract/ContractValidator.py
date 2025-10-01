@@ -19,31 +19,39 @@ class ContractValidator:
             'Contract_Total_Amount'
             'Currency'
         ]
+
+        contract_data = {
+            'Contracted_Company': contract_data.contracted_company.strip(),
+            'Contracting_Company': contract_data.contracting_company.strip(),
+            'Contract_Date': contract_data.contract_date.strip(),
+            'Contract_Total_Amount': str(contract_data.contract_total_amount).strip(),
+            'Currency': contract_data.currency.strip()
+        }
         
         for field in required_fields:
-            value = contract_data.get(field, '').strip()
+            value = contract_data[field].strip()
             if not value or value.upper() == 'N/A':
                 return False
         
         return True
     
-    def is_contract_amount_matching(self, contract_data: Dict, expected_amount: float) -> bool:
+    def is_contract_amount_matching(self, contract_data, expected_amount: float) -> bool:
         """
         Check if the contract total amount matches the expected amount.
         """
         try:
-            if contract_data.get('Currency', '').strip().upper() == 'SAR':
+            if contract_data.currency.strip().upper() == 'SAR':
                 print("Currency is  SAR, as expected")
-                amount_str = str(contract_data.get('Contract_Total_Amount', '')).replace('SAR', '').replace(',', '').strip()
+                amount_str = str(contract_data.contract_total_amount).replace('SAR', '').replace(',', '').strip()
                 amount = float(amount_str)
                 return abs(amount - expected_amount) < 1000  # Allow small tolerance
-            elif contract_data.get('Currency', '').strip().upper() == 'USD':
+            elif contract_data.currency.strip().upper() == 'USD':
                 print("Converting USD to SAR for comparison")
-                amount_str = str(contract_data.get('Contract_Total_Amount', '')).replace('SAR', '').replace(',', '').strip()
+                amount_str = str(contract_data.contract_total_amount).replace('SAR', '').replace(',', '').strip()
                 amount = float(amount_str) * 3.75  # Convert USD to SAR
                 return abs(amount - expected_amount) < 1000
             else:
-                print(f"Unsupported currency: {contract_data.get('Currency', '')}")
+                print(f"Unsupported currency: {contract_data.currency}")
                 return False
             
         except (ValueError, TypeError):

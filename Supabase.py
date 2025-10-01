@@ -16,12 +16,12 @@ class SupabaseClient:
 
     def get_previous_projects(self) -> list:
         """Retrieve all invoices from the Supabase database."""
-        response = self.client.table('contractor_completed_projects').select('*').is_('file_verified', "False").execute()
+        response = self.client.table('contractor_completed_projects').select('*').is_('file_verified', "null").execute()
         return response.data
     
-    def update_project_verification(self, project_id: str, file_verified: bool) -> None:
+    def update_project_verification(self, project_id: str, file_verified: bool, verification_comment: str) -> None:
         """Update the file verification status of a project."""
-        response = self.client.table('contractor_completed_projects').update({'file_verified': file_verified}).eq('id', project_id).execute()
+        response = self.client.table('contractor_completed_projects').update({'file_verified': file_verified, 'verification_comment': verification_comment}).eq('id', project_id).execute()
 
         return response.data
 

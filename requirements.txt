@@ -1,7 +1,7 @@
 boto3
-supabase==1.0.4
-python-dotenv==1.0.1
-requests==2.31.0
+supabase
+python-dotenv
+requests
 anthropic
 opencv-python
 pytesseract
@@ -10,3 +10,7 @@ pdf2image
 python-dotenv
 mysql-connector-python
 flask
+numpy
+PyMuPDF
+pydantic-core
+pydantic
