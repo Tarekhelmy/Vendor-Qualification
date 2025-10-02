@@ -25,7 +25,7 @@ A full-stack web application for vendors to apply for project qualifications. Bu
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Tarekhelmy/Vendor-Qualification
 cd vendor-portal
 ```
 
