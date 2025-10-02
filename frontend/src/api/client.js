@@ -149,6 +149,117 @@ export const form3API = {
     submit: (applicationId) => 
       apiClient.post(`/forms/3/${applicationId}/submit`),
   };
+
+
+// Form 4 API
+export const form4API = {
+    getData: (applicationId) => 
+      apiClient.get(`/forms/4/${applicationId}`),
+    
+    createPersonnel: (applicationId, data) => 
+      apiClient.post(`/forms/4/${applicationId}/personnel`, data),
+    
+    updatePersonnel: (personnelId, data) => 
+      apiClient.put(`/forms/4/personnel/${personnelId}`, data),
+    
+    deletePersonnel: (personnelId) => 
+      apiClient.delete(`/forms/4/personnel/${personnelId}`),
+    
+    submit: (applicationId) => 
+      apiClient.post(`/forms/4/${applicationId}/submit`),
+  };
+
+
+// Form 5 API
+export const form5API = {
+    getData: (applicationId) => 
+      apiClient.get(`/forms/5/${applicationId}`),
+    
+    createResume: (applicationId, data) => 
+      apiClient.post(`/forms/5/${applicationId}/resumes`, data),
+    
+    updateResume: (resumeId, data) => 
+      apiClient.put(`/forms/5/resumes/${resumeId}`, data),
+    
+    deleteResume: (resumeId) => 
+      apiClient.delete(`/forms/5/resumes/${resumeId}`),
+    
+    // Education
+    addEducation: (resumeId, data) => 
+      apiClient.post(`/forms/5/resumes/${resumeId}/education`, data),
+    
+    deleteEducation: (educationId) => 
+      apiClient.delete(`/forms/5/education/${educationId}`),
+    
+    // Work Experience
+    addWorkExperience: (resumeId, data) => 
+      apiClient.post(`/forms/5/resumes/${resumeId}/work-experience`, data),
+    
+    deleteWorkExperience: (experienceId) => 
+      apiClient.delete(`/forms/5/work-experience/${experienceId}`),
+    
+    submit: (applicationId) => 
+      apiClient.post(`/forms/5/${applicationId}/submit`),
+  };
+
+// Form 6 API
+export const form6API = {
+    getData: (applicationId) => 
+      apiClient.get(`/forms/6/${applicationId}`),
+    
+    createManpower: (applicationId, data) => 
+      apiClient.post(`/forms/6/${applicationId}/manpower`, data),
+    
+    updateManpower: (manpowerId, data) => 
+      apiClient.put(`/forms/6/manpower/${manpowerId}`, data),
+    
+    deleteManpower: (manpowerId) => 
+      apiClient.delete(`/forms/6/manpower/${manpowerId}`),
+    
+    submit: (applicationId) => 
+      apiClient.post(`/forms/6/${applicationId}/submit`),
+  };
+
+  // Form 7 API
+export const form7API = {
+    getData: (applicationId) => 
+      apiClient.get(`/forms/7/${applicationId}`),
+    
+    createEquipment: (applicationId, data) => 
+      apiClient.post(`/forms/7/${applicationId}/equipment`, data),
+    
+    updateEquipment: (equipmentId, data) => 
+      apiClient.put(`/forms/7/equipment/${equipmentId}`, data),
+    
+    deleteEquipment: (equipmentId) => 
+      apiClient.delete(`/forms/7/equipment/${equipmentId}`),
+    
+    submit: (applicationId) => 
+      apiClient.post(`/forms/7/${applicationId}/submit`),
+  };
+
+// Form 8 API
+export const form8API = {
+    getData: (applicationId) => 
+      apiClient.get(`/forms/8/${applicationId}`),
+    
+    createResponse: (applicationId, data) => 
+      apiClient.post(`/forms/8/${applicationId}/responses`, data),
+    
+    uploadAttachment: (responseId, file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiClient.post(`/forms/8/responses/${responseId}/attachments`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    },
+    
+    deleteAttachment: (attachmentId) => 
+      apiClient.delete(`/forms/8/attachments/${attachmentId}`),
+    
+    submit: (applicationId) => 
+      apiClient.post(`/forms/8/${applicationId}/submit`),
+  };
 // Documents API
 export const documentsAPI = {
   upload: (formData) =>

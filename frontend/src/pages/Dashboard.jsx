@@ -83,7 +83,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Vendor Portal</h1>
+              <h1 className="text-xl font-bold text-gray-900">Delfourt</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">{vendor?.company_name}</span>
@@ -105,7 +105,7 @@ export default function Dashboard() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900">Welcome, {vendor?.contact_person_name}</h2>
             <p className="mt-1 text-sm text-gray-600">
-              Manage your project qualification applications
+            Manage Your Company's Applications
             </p>
           </div>
 

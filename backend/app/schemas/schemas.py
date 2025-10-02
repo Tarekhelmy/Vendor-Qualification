@@ -346,3 +346,242 @@ class Form3Response(BaseModel):
     ongoing_projects: List[OngoingProjectWithProfile]
     profiles: List[ProjectProfileResponse]
     form_submission: FormSubmissionResponse
+
+
+# Form 4: Management and Supervisory Personnel
+class ManagementPersonnelCreate(BaseModel):
+    full_name: str
+    position: str
+    nationality: Optional[str] = None
+    highest_educational_qualification: Optional[str] = None
+    experience_with_company: Optional[int] = Field(0, ge=0)
+    experience_on_sec_erb_projects: Optional[int] = Field(0, ge=0)
+    experience_total: Optional[int] = Field(0, ge=0)
+
+class ManagementPersonnelUpdate(BaseModel):
+    full_name: Optional[str] = None
+    position: Optional[str] = None
+    nationality: Optional[str] = None
+    highest_educational_qualification: Optional[str] = None
+    experience_with_company: Optional[int] = Field(None, ge=0)
+    experience_on_sec_erb_projects: Optional[int] = Field(None, ge=0)
+    experience_total: Optional[int] = Field(None, ge=0)
+
+class ManagementPersonnelResponse(BaseModel):
+    id: str
+    vendor_id: str
+    application_id: str
+    full_name: str
+    position: str
+    nationality: Optional[str]
+    highest_educational_qualification: Optional[str]
+    experience_with_company: int
+    experience_on_sec_erb_projects: int
+    experience_total: int
+    created_at: datetime
+    updated_at: datetime
+
+class PositionTemplateResponse(BaseModel):
+    id: str
+    position_name: str
+    is_active: bool
+
+class ProjectRequiredPositionResponse(BaseModel):
+    id: str
+    project_id: str
+    position_name: str
+    minimum_count: int
+
+class Form4Response(BaseModel):
+    personnel: List[ManagementPersonnelResponse]
+    available_positions: List[str]
+    required_positions: List[ProjectRequiredPositionResponse]
+    form_submission: FormSubmissionResponse
+
+# Form 5: Personnel Resumes
+class EducationItem(BaseModel):
+    institution_name: str
+    year_from: Optional[int] = None
+    year_to: Optional[int] = None
+    qualification: Optional[str] = None
+    certificate_degree: Optional[str] = None
+
+class WorkExperienceItem(BaseModel):
+    company_name: str
+    position: str
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    is_current: Optional[bool] = False
+    job_description: Optional[str] = None
+
+class EducationResponse(BaseModel):
+    id: str
+    institution_name: str
+    year_from: Optional[int]
+    year_to: Optional[int]
+    qualification: Optional[str]
+    certificate_degree: Optional[str]
+
+class WorkExperienceResponse(BaseModel):
+    id: str
+    company_name: str
+    position: str
+    date_from: Optional[date]
+    date_to: Optional[date]
+    is_current: bool
+    job_description: Optional[str]
+
+class PersonnelResumeCreate(BaseModel):
+    personnel_id: str
+    date_of_birth: Optional[date] = None
+    additional_notes: Optional[str] = None
+
+class PersonnelResumeUpdate(BaseModel):
+    date_of_birth: Optional[date] = None
+    additional_notes: Optional[str] = None
+
+class PersonnelResumeResponse(BaseModel):
+    id: str
+    personnel_id: str
+    application_id: str
+    date_of_birth: Optional[date]
+    additional_notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    education: List[EducationResponse] = []
+    work_experience: List[WorkExperienceResponse] = []
+
+class PersonnelWithResume(BaseModel):
+    id: str
+    full_name: str
+    position: str
+    nationality: Optional[str]
+    has_resume: bool
+    resume_id: Optional[str] = None
+
+class Form5Response(BaseModel):
+    personnel_list: List[PersonnelWithResume]
+    resumes: List[PersonnelResumeResponse]
+    form_submission: FormSubmissionResponse
+
+# Form 6: Skilled and Unskilled Manpower
+class ManpowerCreate(BaseModel):
+    craft_name: str
+    nationality: Optional[str] = None
+    quantity: int = Field(0, ge=0)
+
+class ManpowerUpdate(BaseModel):
+    craft_name: Optional[str] = None
+    nationality: Optional[str] = None
+    quantity: Optional[int] = Field(None, ge=0)
+
+class ManpowerResponse(BaseModel):
+    id: str
+    vendor_id: str
+    application_id: str
+    craft_name: str
+    nationality: Optional[str]
+    quantity: int
+    created_at: datetime
+    updated_at: datetime
+
+class CraftTemplateResponse(BaseModel):
+    id: str
+    craft_name: str
+    is_active: bool
+
+class ProjectRequiredCraftResponse(BaseModel):
+    id: str
+    project_id: str
+    craft_name: str
+    minimum_quantity: int
+
+class Form6Response(BaseModel):
+    manpower: List[ManpowerResponse]
+    available_crafts: List[str]
+    required_crafts: List[ProjectRequiredCraftResponse]
+    form_submission: FormSubmissionResponse
+
+# Form 7: Equipment and Tools
+class EquipmentToolCreate(BaseModel):
+    equipment_type: str
+    capacity: Optional[str] = None
+    year_of_manufacture: Optional[str] = None
+    quantity: int = Field(0, ge=0)
+    present_location: Optional[str] = None
+
+class EquipmentToolUpdate(BaseModel):
+    equipment_type: Optional[str] = None
+    capacity: Optional[str] = None
+    year_of_manufacture: Optional[str] = None
+    quantity: Optional[int] = Field(None, ge=0)
+    present_location: Optional[str] = None
+
+class EquipmentToolResponse(BaseModel):
+    id: str
+    vendor_id: str
+    application_id: str
+    equipment_type: str
+    capacity: Optional[str]
+    year_of_manufacture: Optional[str]
+    quantity: int
+    present_location: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+class EquipmentTemplateResponse(BaseModel):
+    id: str
+    equipment_type: str
+    is_active: bool
+
+class ProjectRequiredEquipmentResponse(BaseModel):
+    id: str
+    project_id: str
+    equipment_type: str
+    minimum_quantity: int
+
+class Form7Response(BaseModel):
+    equipment: List[EquipmentToolResponse]
+    available_equipment_types: List[str]
+    required_equipment: List[ProjectRequiredEquipmentResponse]
+    form_submission: FormSubmissionResponse
+
+# Form 8: Questionnaire
+class QuestionnaireQuestionResponse(BaseModel):
+    id: str
+    project_id: Optional[str]
+    question_number: int
+    question_text: str
+    requires_attachment: bool  # Always False now
+    is_active: bool
+
+class QuestionnaireAttachmentResponse(BaseModel):
+    id: str
+    document_type: str
+    file_name: str
+    file_size: int
+    file_type: str
+    s3_url: str
+    uploaded_at: datetime
+
+class QuestionnaireResponseCreate(BaseModel):
+    question_id: str
+    answer_text: Optional[str] = None
+
+class QuestionnaireResponseUpdate(BaseModel):
+    answer_text: Optional[str] = None
+
+class QuestionnaireResponseDetail(BaseModel):
+    id: str
+    vendor_id: str
+    application_id: str
+    question_id: str
+    answer_text: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    attachments: List[QuestionnaireAttachmentResponse] = []
+
+class Form8Response(BaseModel):
+    questions: List[QuestionnaireQuestionResponse]
+    responses: List[QuestionnaireResponseDetail]
+    form_submission: FormSubmissionResponse

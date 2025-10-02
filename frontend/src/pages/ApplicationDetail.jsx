@@ -29,17 +29,11 @@ export default function ApplicationDetail() {
     { number: 1, title: 'List of Projects Completed (Last 5 Years)', path: `/application/${applicationId}/form/1` },
     { number: 2, title: 'List of Ongoing Projects', path: `/application/${applicationId}/form/2` },
     { number: 3, title: 'Profile of Ongoing Projects', path: `/application/${applicationId}/form/3` },
-    { number: 4, title: 'Form 4 Title', path: '#', disabled: true },
-    { number: 5, title: 'Form 5 Title', path: '#', disabled: true },
-    { number: 6, title: 'Form 6 Title', path: '#', disabled: true },
-    { number: 7, title: 'Form 7 Title', path: '#', disabled: true },
-    { number: 8, title: 'Form 8 Title', path: '#', disabled: true },
-    { number: 9, title: 'Form 9 Title', path: '#', disabled: true },
-    { number: 10, title: 'Form 10 Title', path: '#', disabled: true },
-    { number: 11, title: 'Form 11 Title', path: '#', disabled: true },
-    { number: 12, title: 'Form 12 Title', path: '#', disabled: true },
-    { number: 13, title: 'Form 13 Title', path: '#', disabled: true },
-    { number: 14, title: 'Form 14 Title', path: '#', disabled: true },
+    { number: 4, title: 'Total Management and Supervisory Personnel', path: `/application/${applicationId}/form/4` },
+    { number: 5, title: 'Resume of Management and Supervisory Personnel', path: `/application/${applicationId}/form/5` },
+    { number: 6, title: 'Total Skilled and Unskilled Manpower', path: `/application/${applicationId}/form/6` },
+    { number: 7, title: 'List of Equipment and Tools', path: `/application/${applicationId}/form/7` },
+    { number: 8, title: 'Project-Specific Questionnaire', path: `/application/${applicationId}/form/8` }
   ];
 
   if (isLoading) {

@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import auth, vendors, applications, forms, documents
+from app.api.routes import auth, vendors, applications, documents
+from app.api.routes import form1, form2, form3, form4, form5
+from app.api.routes import form6  # Add to imports
+from app.api.routes import form7
+from app.api.routes import form8
+
+
+
 
 app = FastAPI(
     title="Vendor Qualification Portal API",
@@ -24,7 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(vendors.router, prefix="/api/vendors", tags=["Vendors"])
@@ -33,6 +39,12 @@ app.include_router(documents.router, prefix="/api/documents", tags=["Documents"]
 app.include_router(form1.router, prefix="/api/forms", tags=["Form 1"])
 app.include_router(form2.router, prefix="/api/forms", tags=["Form 2"])
 app.include_router(form3.router, prefix="/api/forms", tags=["Form 3"])
+app.include_router(form4.router, prefix="/api/forms", tags=["Form 4"])
+app.include_router(form5.router, prefix="/api/forms", tags=["Form 5"])
+app.include_router(form6.router, prefix="/api/forms", tags=["Form 6"])  # Add with other routers
+app.include_router(form7.router, prefix="/api/forms", tags=["Form 7"])
+app.include_router(form8.router, prefix="/api/forms", tags=["Form 8"])
+
 
 @app.get("/")
 async def root():
