@@ -6,6 +6,7 @@ from app.api.routes import form6  # Add to imports
 from app.api.routes import form7
 from app.api.routes import form8
 from app.api.routes import profile
+from app.api.routes import notifications
 
 
 
@@ -46,6 +47,7 @@ app.include_router(form6.router, prefix="/api/forms", tags=["Form 6"])  # Add wi
 app.include_router(form7.router, prefix="/api/forms", tags=["Form 7"])
 app.include_router(form8.router, prefix="/api/forms", tags=["Form 8"])
 app.include_router(profile.router, prefix="/api/profile", tags=["Profile"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
 
 @app.get("/")
 async def root():

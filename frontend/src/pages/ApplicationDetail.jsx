@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { applicationsAPI } from '../api/client';
 import { format } from 'date-fns';
+import PageNotifications from '../components/PageNotifications';
 
 export default function ApplicationDetail() {
   const { applicationId } = useParams();
@@ -116,6 +117,8 @@ export default function ApplicationDetail() {
               </dl>
             </div>
           </div>
+          <PageNotifications formNumber={null} />
+
 
           {/* Forms List */}
           <div className="bg-white shadow overflow-hidden sm:rounded-lg">

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form1API, documentsAPI } from '../../api/client';
 import { useConfirm } from '../../hooks/useConfirm';
-
+import PageNotifications from '../../components/PageNotifications';
 
 export default function Form1() {
   const { applicationId } = useParams();
@@ -284,7 +284,7 @@ export default function Form1() {
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
-
+          <PageNotifications formNumber={1} />
           {/* Add Project Button */}
           {!formSubmission?.is_locked && (
             <div className="mb-6">

@@ -287,6 +287,24 @@ export const profileAPI = {
     deleteLegalDocument: (documentType) => 
       apiClient.delete(`/profile/legal-document/${documentType}`),
   };
+
+// Notifications API
+export const notificationsAPI = {
+    getAll: (unreadOnly = false, limit = 50) => 
+      apiClient.get('/notifications', { params: { unread_only: unreadOnly, limit } }),
+    
+    getUnreadCount: () => 
+      apiClient.get('/notifications/unread-count'),
+    
+    markAsRead: (notificationId) => 
+      apiClient.put(`/notifications/${notificationId}/read`),
+    
+    markAllRead: () => 
+      apiClient.put('/notifications/mark-all-read'),
+    
+    delete: (notificationId) => 
+      apiClient.delete(`/notifications/${notificationId}`),
+  };
 // Documents API
 export const documentsAPI = {
   upload: (formData) =>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form4API } from '../../api/client';
 import { useConfirm } from '../../hooks/useConfirm';
+import PageNotifications from '../../components/PageNotifications';
 
 export default function Form4() {
   const { applicationId } = useParams();
@@ -212,7 +213,7 @@ export default function Form4() {
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
-
+        <PageNotifications formNumber={1} />
           {/* Required Positions Summary */}
           {requiredPositions.length > 0 && (
             <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">

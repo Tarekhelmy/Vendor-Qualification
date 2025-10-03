@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 import { applicationsAPI, projectsAPI, profileAPI } from '../api/client';
 import { format } from 'date-fns';
+import NotificationBell from '../components/NotificationBell';
 
 export default function Dashboard() {
     const { vendor, logout } = useAuthStore();
@@ -122,6 +123,7 @@ export default function Dashboard() {
               </button>
 
               {/* Logout Button */}
+              <NotificationBell />
               <button
                 onClick={logout}
                 className="text-sm text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100 transition"

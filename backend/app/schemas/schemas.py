@@ -613,3 +613,27 @@ class VendorProfileResponse(BaseModel):
     legal_documents: List[LegalDocumentResponse]
     profile_complete: bool
     missing_items: List[str]
+
+class NotificationCreate(BaseModel):
+    vendor_id: str
+    application_id: Optional[str] = None
+    form_number: Optional[int] = None
+    notification_type: str
+    title: str
+    message: str
+    priority: str = "normal"
+    action_url: Optional[str] = None
+
+class NotificationResponse(BaseModel):
+    id: str
+    vendor_id: str
+    application_id: Optional[str]
+    form_number: Optional[int]
+    notification_type: str
+    title: str
+    message: str
+    is_read: bool
+    priority: str
+    action_url: Optional[str]
+    created_at: datetime
+    read_at: Optional[datetime]
