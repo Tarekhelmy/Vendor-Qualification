@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form7API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form7() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [equipment, setEquipment] = useState([]);
   const [availableEquipmentTypes, setAvailableEquipmentTypes] = useState([]);
   const [requiredEquipment, setRequiredEquipment] = useState([]);
@@ -104,8 +105,14 @@ export default function Form7() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this equipment entry?')) return;
-
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this equipment entry?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
     try {
       await form7API.deleteEquipment(equipmentId);
       setEquipment(equipment.filter(e => e.id !== equipmentId));
@@ -122,9 +129,14 @@ export default function Form7() {
       return;
     }
 
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
 
     try {
       setIsSaving(true);
@@ -159,6 +171,8 @@ export default function Form7() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+    {/* This line renders the confirmation modal */}
+      <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

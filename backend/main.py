@@ -5,6 +5,7 @@ from app.api.routes import form1, form2, form3, form4, form5
 from app.api.routes import form6  # Add to imports
 from app.api.routes import form7
 from app.api.routes import form8
+from app.api.routes import profile
 
 
 
@@ -44,7 +45,7 @@ app.include_router(form5.router, prefix="/api/forms", tags=["Form 5"])
 app.include_router(form6.router, prefix="/api/forms", tags=["Form 6"])  # Add with other routers
 app.include_router(form7.router, prefix="/api/forms", tags=["Form 7"])
 app.include_router(form8.router, prefix="/api/forms", tags=["Form 8"])
-
+app.include_router(profile.router, prefix="/api/profile", tags=["Profile"])
 
 @app.get("/")
 async def root():

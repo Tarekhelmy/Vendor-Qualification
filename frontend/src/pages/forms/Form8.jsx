@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form8API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form8() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState([]);
   const [formSubmission, setFormSubmission] = useState(null);
@@ -126,7 +127,14 @@ export default function Form8() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this file?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this file?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
 
     try {
       await form8API.deleteAttachment(attachmentId);
@@ -148,10 +156,15 @@ export default function Form8() {
       setError(`Please answer all questions. ${unansweredQuestions.length} question(s) remaining.`);
       return;
     }
-  
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
+
   
     try {
       setIsSaving(true);
@@ -181,6 +194,8 @@ export default function Form8() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+    {/* This line renders the confirmation modal */}
+    <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

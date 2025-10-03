@@ -15,6 +15,8 @@ import Form5 from './pages/forms/Form5';
 import Form6 from './pages/forms/Form6';
 import Form7 from './pages/forms/Form7';
 import Form8 from './pages/forms/Form8';
+import Profile from './pages/Profile';
+
 
 
 
@@ -133,7 +135,16 @@ function App() {
             </ProtectedRoute>
         }
         />
-        
+
+        <Route
+        path="/profile"
+        element={
+            <ProtectedRoute>
+            <Profile />
+            </ProtectedRoute>
+        }
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

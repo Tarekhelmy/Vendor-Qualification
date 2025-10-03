@@ -4,3 +4,4 @@ archive
 .venv
 .DS_Store
 frontend/node_modules
+rough.md

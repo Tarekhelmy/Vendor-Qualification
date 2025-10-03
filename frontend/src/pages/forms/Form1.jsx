@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form1API, documentsAPI } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
+
 
 export default function Form1() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [projects, setProjects] = useState([]);
   const [formSubmission, setFormSubmission] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,8 +103,14 @@ export default function Form1() {
       setError('Form is locked. Request unlock permission to edit.');
       return;
     }
-
-    if (!confirm('Are you sure you want to delete this project?')) return;
+    const confirmed = await confirm({
+      title: "Delete Project",
+      message: "Are you sure you want to delete this project? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!confirmed) return;
 
     try {
       await form1API.deleteProject(projectId);
@@ -161,7 +169,14 @@ export default function Form1() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this document?')) return;
+    const confirmed = await confirm({
+      title: "Delete Project",
+      message: "Are you sure you want to delete this document?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "danger"
+    });
+    if (!confirmed) return;
 
     try {
       await documentsAPI.delete(documentId);
@@ -190,9 +205,16 @@ export default function Form1() {
       return;
     }
 
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: "Submit Form",
+      message: "Are you sure you want to submit this form? It will be locked after submission.",
+      confirmText: "Submit",
+      cancelText: "Cancel",
+      type: "warning"
+    });
+
+    if (!confirmed) return;
+
 
     try {
       setIsSaving(true);
@@ -217,7 +239,11 @@ export default function Form1() {
   }
 
   return (
+    
     <div className="min-h-screen bg-gray-50">
+      {/* This line renders the confirmation modal */}
+      <ConfirmDialog />
+
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

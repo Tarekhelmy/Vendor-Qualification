@@ -1,40 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import { applicationsAPI, projectsAPI } from '../api/client';
+import { applicationsAPI, projectsAPI, profileAPI } from '../api/client';
 import { format } from 'date-fns';
 
 export default function Dashboard() {
-  const { vendor, logout } = useAuthStore();
-  const navigate = useNavigate();
+    const { vendor, logout } = useAuthStore();
+    const navigate = useNavigate();
+    
+    const [applications, setApplications] = useState([]);
+    const [availableProjects, setAvailableProjects] = useState([]);
+    const [profileComplete, setProfileComplete] = useState(true); // Add this state
+    const [isLoading, setIsLoading] = useState(true);
+    const [showNewAppModal, setShowNewAppModal] = useState(false);
+    const [selectedProject, setSelectedProject] = useState('');
+    const [error, setError] = useState('');
   
-  const [applications, setApplications] = useState([]);
-  const [availableProjects, setAvailableProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showNewAppModal, setShowNewAppModal] = useState(false);
-  const [selectedProject, setSelectedProject] = useState('');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const [appsRes, projsRes] = await Promise.all([
-        applicationsAPI.getAll(),
-        projectsAPI.getAvailableProjects()
-      ]);
-      
-      setApplications(appsRes.data);
-      setAvailableProjects(projsRes.data);
-    } catch (err) {
-      setError('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    useEffect(() => {
+      loadData();
+      checkProfileCompletion(); // Add this
+    }, []);
+  
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [appsRes, projsRes] = await Promise.all([
+          applicationsAPI.getAll(),
+          projectsAPI.getAvailableProjects()
+        ]);
+        
+        setApplications(appsRes.data);
+        setAvailableProjects(projsRes.data);
+      } catch (err) {
+        setError('Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    // Add this function
+    const checkProfileCompletion = async () => {
+      try {
+        const response = await profileAPI.getProfile();
+        setProfileComplete(response.data.profile_complete);
+      } catch (err) {
+        console.error('Failed to check profile completion:', err);
+      }
+    };
 
   const handleCreateApplication = async () => {
     if (!selectedProject) {
@@ -83,13 +95,36 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Delfourt</h1>
+              <h1 className="text-xl font-bold text-gray-900">Vendor Portal</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">{vendor?.company_name}</span>
+              {/* Profile Card Button with Warning */}
+              <button
+                onClick={() => navigate('/profile')}
+                className="relative flex items-center space-x-3 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                {/* Warning Badge */}
+                {!profileComplete && (
+                  <div className="absolute -top-1 -right-1 h-6 w-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                    <span className="text-white text-xs font-bold">!</span>
+                  </div>
+                )}
+                
+                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20">
+                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <p className="text-xs text-blue-100">Profile</p>
+                  <p className="text-sm font-semibold text-white">{vendor?.company_name}</p>
+                </div>
+              </button>
+
+              {/* Logout Button */}
               <button
                 onClick={logout}
-                className="text-sm text-gray-700 hover:text-gray-900"
+                className="text-sm text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100 transition"
               >
                 Logout
               </button>

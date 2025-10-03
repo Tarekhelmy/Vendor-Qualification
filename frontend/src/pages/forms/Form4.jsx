@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form4API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form4() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [personnel, setPersonnel] = useState([]);
   const [availablePositions, setAvailablePositions] = useState([]);
   const [requiredPositions, setRequiredPositions] = useState([]);
@@ -106,8 +107,14 @@ export default function Form4() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this personnel record?')) return;
-
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this personnel record?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
     try {
       await form4API.deletePersonnel(personnelId);
       setPersonnel(personnel.filter(p => p.id !== personnelId));
@@ -123,10 +130,15 @@ export default function Form4() {
       setError('Please add at least one personnel record before submitting');
       return;
     }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
 
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
 
     try {
       setIsSaving(true);
@@ -158,6 +170,8 @@ export default function Form4() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+        {/* This line renders the confirmation modal */}
+      <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

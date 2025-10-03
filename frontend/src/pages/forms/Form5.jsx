@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form5API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form5() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [personnelList, setPersonnelList] = useState([]);
   const [resumes, setResumes] = useState([]);
   const [formSubmission, setFormSubmission] = useState(null);
@@ -13,6 +14,7 @@ export default function Form5() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [error, setError] = useState('');
+  const [expandedResumes, setExpandedResumes] = useState(new Set());
 
   useEffect(() => {
     loadFormData();
@@ -65,6 +67,9 @@ export default function Form5() {
         prev.map(p => p.id === personnelId ? { ...p, has_resume: true, resume_id: response.data.id } : p)
       );
       
+      // Auto-expand the newly created resume
+      setExpandedResumes(prev => new Set(prev).add(response.data.id));
+      
       showSaveStatus('saved');
     } catch (err) {
       const errorMsg = err.response?.data?.detail || 'Failed to create resume';
@@ -97,20 +102,34 @@ export default function Form5() {
       setError(typeof errorMsg === 'string' ? errorMsg : 'Failed to save changes');
       setSaveStatus('');
       console.error('Update error:', err.response?.data);
+      // Revert the optimistic update on error
+      loadFormData();
     }
-  }, [applicationId, formSubmission]);
+  }, [formSubmission]);
 
   const handleDeleteResume = async (resumeId, personnelId) => {
     if (formSubmission?.is_locked) {
       setError('Form is locked. Request unlock permission to edit.');
       return;
     }
-
-    if (!confirm('Are you sure you want to delete this resume?')) return;
-
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this resume?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
     try {
       await form5API.deleteResume(resumeId);
       setResumes(resumes.filter(r => r.id !== resumeId));
+      
+      // Remove from expanded set
+      setExpandedResumes(prev => {
+        const next = new Set(prev);
+        next.delete(resumeId);
+        return next;
+      });
       
       // Update personnel list
       setPersonnelList(prev =>
@@ -129,10 +148,14 @@ export default function Form5() {
       setError('Please create at least one resume before submitting');
       return;
     }
-
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
 
     try {
       setIsSaving(true);
@@ -148,6 +171,18 @@ export default function Form5() {
     }
   };
 
+  const toggleExpanded = (resumeId) => {
+    setExpandedResumes(prev => {
+      const next = new Set(prev);
+      if (next.has(resumeId)) {
+        next.delete(resumeId);
+      } else {
+        next.add(resumeId);
+      }
+      return next;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -160,6 +195,8 @@ export default function Form5() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+        {/* This line renders the confirmation modal */}
+      <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -259,6 +296,8 @@ export default function Form5() {
                     resume={resume}
                     person={person}
                     isLocked={formSubmission?.is_locked}
+                    isExpanded={expandedResumes.has(resume.id)}
+                    onToggleExpanded={() => toggleExpanded(resume.id)}
                     onUpdate={handleUpdateResume}
                     onDelete={handleDeleteResume}
                     onRefresh={loadFormData}
@@ -295,9 +334,7 @@ export default function Form5() {
 }
 
 // Resume Card Component
-function ResumeCard({ resume, person, isLocked, onUpdate, onDelete, onRefresh }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
+function ResumeCard({ resume, person, isLocked, isExpanded, onToggleExpanded, onUpdate, onDelete, onRefresh }) {
   const handleFieldChange = (field, value) => {
     onUpdate(resume.id, field, value);
   };
@@ -325,7 +362,7 @@ function ResumeCard({ resume, person, isLocked, onUpdate, onDelete, onRefresh })
               </button>
             )}
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={onToggleExpanded}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
               {isExpanded ? 'Collapse' : 'Expand'}
@@ -453,7 +490,14 @@ function EducationList({ resumeId, education, isLocked, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this education entry?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this education entry?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
     try {
       await form5API.deleteEducation(id);
       onRefresh();
@@ -621,7 +665,14 @@ function WorkExperienceList({ resumeId, workExperience, isLocked, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this work experience?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this work experience?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
     try {
       await form5API.deleteWorkExperience(id);
       onRefresh();
@@ -667,7 +718,7 @@ function WorkExperienceList({ resumeId, workExperience, isLocked, onRefresh }) {
                 placeholder="From Date"
                 value={newItem.date_from}
                 onChange={(e) => setNewItem({ ...newItem, date_from: e.target.value })}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md"
+                className="px-3 py-2 text-sm border-gray-300 rounded-md"
               />
               <input
                 type="date"
@@ -675,7 +726,7 @@ function WorkExperienceList({ resumeId, workExperience, isLocked, onRefresh }) {
                 value={newItem.date_to}
                 onChange={(e) => setNewItem({ ...newItem, date_to: e.target.value })}
                 disabled={newItem.is_current}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-md disabled:bg-gray-100"
+                className="px-3 py-2 text-sm border-gray-300 rounded-md disabled:bg-gray-100"
               />
             </div>
             <label className="flex items-center">
@@ -692,7 +743,7 @@ function WorkExperienceList({ resumeId, workExperience, isLocked, onRefresh }) {
               value={newItem.job_description}
               onChange={(e) => setNewItem({ ...newItem, job_description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 text-sm border-gray-300 rounded-md"
             />
           </div>
           <div className="flex space-x-2">

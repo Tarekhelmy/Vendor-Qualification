@@ -260,6 +260,33 @@ export const form8API = {
     submit: (applicationId) => 
       apiClient.post(`/forms/8/${applicationId}/submit`),
   };
+
+// Profile API
+export const profileAPI = {
+    getProfile: () => apiClient.get('/profile/me'),
+    
+    uploadFinancialStatement: (year, file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiClient.post(`/profile/financial-statement/${year}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    },
+    
+    deleteFinancialStatement: (year) => 
+      apiClient.delete(`/profile/financial-statement/${year}`),
+    
+    uploadLegalDocument: (documentType, file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiClient.post(`/profile/legal-document/${documentType}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    },
+    
+    deleteLegalDocument: (documentType) => 
+      apiClient.delete(`/profile/legal-document/${documentType}`),
+  };
 // Documents API
 export const documentsAPI = {
   upload: (formData) =>

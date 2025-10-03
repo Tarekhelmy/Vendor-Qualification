@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form3API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form3() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const [expandedProfiles, setExpandedProfiles] = useState({}); // New state to track expansion
   const [ongoingProjects, setOngoingProjects] = useState([]);
+  const { confirm, ConfirmDialog } = useConfirm();
   const [profiles, setProfiles] = useState([]);
   const [formSubmission, setFormSubmission] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,13 +16,19 @@ export default function Form3() {
   const [saveStatus, setSaveStatus] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadFormData();
-  }, [applicationId]);
-
-  const loadFormData = async () => {
+  const toggleProfileExpansion = (profileId, isExpanded) => {
+    setExpandedProfiles(prev => ({
+      ...prev,
+      [profileId]: isExpanded,
+    }));
+  };
+  
+  const loadFormData = async (showLoadingSpinner = true) => {
     try {
-      setIsLoading(true);
+      // Only set loading state if showLoadingSpinner is true
+      if (showLoadingSpinner) { 
+        setIsLoading(true);
+      }
       const response = await form3API.getData(applicationId);
       setOngoingProjects(response.data.ongoing_projects);
       setProfiles(response.data.profiles);
@@ -31,9 +39,17 @@ export default function Form3() {
       setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       console.error(err);
     } finally {
-      setIsLoading(false);
+      // Only set loading state if showLoadingSpinner is true
+      if (showLoadingSpinner) {
+        setIsLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    loadFormData(true); // Initial load shows spinner
+  }, [applicationId]);
+
 
   const showSaveStatus = (status) => {
     setSaveStatus(status);
@@ -117,7 +133,14 @@ export default function Form3() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this profile?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this profile?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+      if (!confirmed) return;
 
     try {
       await form3API.deleteProfile(profileId);
@@ -140,10 +163,15 @@ export default function Form3() {
       setError('Please create at least one project profile before submitting');
       return;
     }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "warning"
+      });
+    if (!confirmed) return;
 
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
 
     try {
       setIsSaving(true);
@@ -171,6 +199,8 @@ export default function Form3() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+        {/* This line renders the confirmation modal */}
+      <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -270,7 +300,7 @@ export default function Form3() {
               {profiles.map((profile, index) => {
                 const relatedProject = ongoingProjects.find(p => p.id === profile.ongoing_project_id);
                 return (
-                  <ProfileCard
+                <ProfileCard
                     key={profile.id}
                     profile={profile}
                     relatedProject={relatedProject}
@@ -278,10 +308,13 @@ export default function Form3() {
                     isLocked={formSubmission?.is_locked}
                     onUpdate={handleUpdateProfile}
                     onDelete={handleDeleteProfile}
-                    onRefresh={loadFormData}
-                  />
+                    onRefresh={() => loadFormData(false)} // Use loadFormData(false) for local list updates
+                    // New Props
+                    isExpanded={expandedProfiles[profile.id] || false} // Pass current state
+                    onToggleExpand={toggleProfileExpansion} // Pass toggler function
+                />
                 );
-              })}
+            })}
             </div>
           )}
 
@@ -312,9 +345,12 @@ export default function Form3() {
 }
 
 // Profile Card Component
-function ProfileCard({ profile, relatedProject, index, isLocked, onUpdate, onDelete, onRefresh }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function ProfileCard({ profile, relatedProject, index, isLocked, onUpdate, onDelete, onRefresh, isExpanded, onToggleExpand  }) {
+//   const [isExpanded, setIsExpanded] = useState(false);
 
+const handleToggle = () => {
+    onToggleExpand(profile.id, !isExpanded);
+};
   const handleFieldChange = (field, value) => {
     onUpdate(profile.id, field, value);
   };
@@ -342,11 +378,11 @@ function ProfileCard({ profile, relatedProject, index, isLocked, onUpdate, onDel
               </button>
             )}
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              {isExpanded ? 'Collapse' : 'Expand'}
-            </button>
+            onClick={handleToggle} // Call the new handler
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+            {isExpanded ? 'Collapse' : 'Expand'}
+        </button>
           </div>
         </div>
       </div>
@@ -570,7 +606,14 @@ function PersonnelList({ profileId, personnel, isLocked, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this personnel entry?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this personnel entry?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
     try {
       await form3API.deletePersonnel(id);
       onRefresh();
@@ -679,7 +722,14 @@ function EquipmentList({ profileId, equipment, isLocked, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this equipment?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this equipment?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
     try {
       await form3API.deleteEquipment(id);
       onRefresh();
@@ -779,7 +829,14 @@ function MaterialsList({ profileId, materials, isLocked, onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this material?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this material?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
     try {
       await form3API.deleteMaterial(id);
       onRefresh();
@@ -884,7 +941,14 @@ function SubcontractorsList({ profileId, subcontractors, isLocked, onRefresh }) 
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this subcontractor?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Delete this subcontractor?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
     try {
       await form3API.deleteSubcontractor(id);
       onRefresh();

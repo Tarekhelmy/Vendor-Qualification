@@ -585,3 +585,31 @@ class Form8Response(BaseModel):
     questions: List[QuestionnaireQuestionResponse]
     responses: List[QuestionnaireResponseDetail]
     form_submission: FormSubmissionResponse
+
+# Vendor Profile Documents
+class FinancialStatementResponse(BaseModel):
+    id: str
+    vendor_id: str
+    year: int
+    file_name: str
+    file_size: int
+    file_type: str
+    s3_url: str
+    uploaded_at: datetime
+
+class LegalDocumentResponse(BaseModel):
+    id: str
+    vendor_id: str
+    document_type: str
+    file_name: str
+    file_size: int
+    file_type: str
+    s3_url: str
+    uploaded_at: datetime
+
+class VendorProfileResponse(BaseModel):
+    vendor: VendorResponse
+    financial_statements: List[FinancialStatementResponse]
+    legal_documents: List[LegalDocumentResponse]
+    profile_complete: bool
+    missing_items: List[str]

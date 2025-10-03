@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { form6API } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function Form6() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  
+  const { confirm, ConfirmDialog } = useConfirm();
   const [manpower, setManpower] = useState([]);
   const [availableCrafts, setAvailableCrafts] = useState([]);
   const [requiredCrafts, setRequiredCrafts] = useState([]);
@@ -102,7 +103,14 @@ export default function Form6() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this manpower entry?')) return;
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to delete this manpower entry?",
+        confirmText: "Delete",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
 
     try {
       await form6API.deleteManpower(manpowerId);
@@ -120,9 +128,14 @@ export default function Form6() {
       return;
     }
 
-    if (!confirm('Are you sure you want to submit this form? It will be locked after submission.')) {
-      return;
-    }
+    const confirmed = await confirm({
+        title: "Delete Project",
+        message: "Are you sure you want to submit this form? It will be locked after submission.",
+        confirmText: "Submit",
+        cancelText: "Cancel",
+        type: "danger"
+      });
+    if (!confirmed) return;
 
     try {
       setIsSaving(true);
@@ -157,6 +170,8 @@ export default function Form6() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+    {/* This line renders the confirmation modal */}
+    <ConfirmDialog />
       {/* Header */}
       <nav className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
